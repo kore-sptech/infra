@@ -129,3 +129,39 @@ variable "backend_env" {
     SPRING_RABBITMQ_PASSWORD   = "guest"
   }
 }
+
+# ==========================================
+# S3 E ACESSO DO BACKEND AO BUCKET
+# ==========================================
+variable "s3_bucket_name" {
+  description = "Nome do bucket de fotos. Vazio gera kore-fotos-<account_id> automaticamente"
+  type        = string
+  default     = ""
+}
+
+variable "backend_instance_profile" {
+  description = "Instance profile anexado à EC2 privada para o backend assumir permissões de S3 (no AWS Academy use LabInstanceProfile). Vazio desativa."
+  type        = string
+  default     = "LabInstanceProfile"
+}
+
+variable "backend_aws_access_key_id" {
+  description = "Credencial estática para o container do backend. Deixe vazio para usar o instance profile (recomendado)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "backend_aws_secret_access_key" {
+  description = "Credencial estática para o container do backend. Deixe vazio para usar o instance profile (recomendado)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "backend_aws_session_token" {
+  description = "Token de sessão temporário do Learner Lab (expira em ~4h). Deixe vazio para usar o instance profile"
+  type        = string
+  default     = ""
+  sensitive   = true
+}

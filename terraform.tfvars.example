@@ -29,3 +29,15 @@ backend_env = {
   SPRING_RABBITMQ_USERNAME   = "guest"
   SPRING_RABBITMQ_PASSWORD   = "guest"
 }
+
+# Bucket de fotos. Vazio = kore-fotos-<account_id>
+s3_bucket_name = ""
+
+# Preferido: a EC2 privada assume a role do lab e o SDK pega as credenciais sozinho
+backend_instance_profile = "LabInstanceProfile"
+
+# Alternativa (expira em ~4h): credenciais estaticas injetadas no container kore-main.
+# Deixe vazio se usar o instance profile acima.
+# backend_aws_access_key_id     = ""
+# backend_aws_secret_access_key = ""
+# backend_aws_session_token     = ""

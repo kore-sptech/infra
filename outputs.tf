@@ -33,6 +33,16 @@ output "url_rabbitmq_management" {
   value       = "http://${aws_instance.proxy.public_ip}/rabbitmq/"
 }
 
+output "s3_bucket_name" {
+  description = "Nome do bucket de fotos usado pelo backend"
+  value       = aws_s3_bucket.fotos.bucket
+}
+
+output "s3_public_base_url" {
+  description = "URL base publica dos objetos do bucket (AWS_S3_PUBLIC_BASE_URL)"
+  value       = "https://${aws_s3_bucket.fotos.bucket}.s3.${var.aws_region}.amazonaws.com"
+}
+
 output "ssh_command_proxy" {
   description = "Comando para conectar via SSH no Proxy (coloque seu labsuser.pem ou vockey.pem)"
   value       = "ssh -i labsuser.pem ubuntu@${aws_instance.proxy.public_ip}"
