@@ -8,26 +8,13 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - frontend-1
-      - frontend-2
-      - frontend-3
+      - kore-main
     restart: always
 
   # Instância 1 do Frontend (puxando a imagem do Docker Hub)
   frontend-1:
     image: henryfranz/kore-front-end:latest
     container_name: frontend-1
-    restart: always
-
-  # Instância 2 do Frontend (puxando a imagem do Docker Hub)
-  frontend-2:
-    image: henryfranz/kore-front-end:latest
-    container_name: frontend-2
-    restart: always
-
-  # Instância 3 do Frontend (puxando a imagem do Docker Hub)
-  frontend-3:
-    image: henryfranz/kore-front-end:latest
-    container_name: frontend-3
     restart: always
 
   kore-main:
