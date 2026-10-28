@@ -34,8 +34,8 @@ backend_env = {
 s3_bucket_name = ""
 
 # false: bucket criado manualmente pela console, Terraform so referencia
-# (necessario se a SCP do lab negar GetObjectLockConfiguration)
-create_s3_bucket = true
+# (necessario no AWS Academy: a SCP nega GetObjectLockConfiguration)
+create_s3_bucket = false
 
 # Preferido: a EC2 privada assume a role do lab e o SDK pega as credenciais sozinho
 backend_instance_profile = "LabInstanceProfile"

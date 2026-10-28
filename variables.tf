@@ -140,9 +140,9 @@ variable "s3_bucket_name" {
 }
 
 variable "create_s3_bucket" {
-  description = "true cria o bucket pelo Terraform; false apenas referencia um bucket já existente (use se a SCP do lab bloquear a leitura do bucket)"
+  description = "false apenas referencia um bucket já existente (padrão: a SCP do AWS Academy nega GetObjectLockConfiguration e quebra o aws_s3_bucket). true cria o bucket pelo Terraform, em contas sem essa restrição."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "backend_instance_profile" {
