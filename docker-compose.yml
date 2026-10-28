@@ -1,5 +1,4 @@
 services:
-  # Nginx Proxy Reverso e Balanceador de Carga
   nginx-proxy:
     image: nginx:alpine
     container_name: nginx-proxy
@@ -30,3 +29,70 @@ services:
     image: henryfranz/kore-front-end:latest
     container_name: frontend-3
     restart: always
+
+  kore-main:
+    image: henryfranz/kore-back-end-main:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+  kore-notification:
+    image: henryfranz/kore-back-end-notification:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8081:8081"
+    depends_on:
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+  database:
+    image: mysql:9
+    user: "0:0"
+    ports:
+      - "127.0.0.1:3306:3306"
+    command: --bind-address=0.0.0.0 --socket=/var/run/mysqld/mysqld.sock --default-time-zone=America/Sao_Paulo
+    env_file:
+      - .env
+    tmpfs:
+      - /var/run/mysqld
+    volumes:
+      - MYSQL_DATA:/var/lib/mysql:z
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p$$MYSQL_ROOT_PASSWORD",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  MYSQL_DATA:
