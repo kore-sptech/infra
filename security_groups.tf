@@ -63,6 +63,15 @@ resource "aws_security_group" "backend" {
     security_groups = [aws_security_group.proxy.id]
   }
 
+  # Microservico de notificacao (Porta 8081) vindo do Proxy
+  ingress {
+    description     = "Microservico de notificacao vindo do Proxy"
+    from_port       = 8081
+    to_port         = 8081
+    protocol        = "tcp"
+    security_groups = [aws_security_group.proxy.id]
+  }
+
   # RabbitMQ Management Dashboard (Porta 15672) vindo do Proxy
   ingress {
     description     = "RabbitMQ Web UI vindo do Proxy"

@@ -18,9 +18,14 @@ output "url_frontend" {
   value       = "http://${aws_instance.proxy.public_ip}"
 }
 
-output "url_api_health" {
-  description = "URL publica para testar a comunicacao com o Backend na subnet privada"
-  value       = "http://${aws_instance.proxy.public_ip}/api/health"
+output "url_api" {
+  description = "Base da API principal (o prefixo /api e removido antes de chegar no kore-main:8080)"
+  value       = "http://${aws_instance.proxy.public_ip}/api/"
+}
+
+output "url_notification" {
+  description = "Base do microservico de notificacao (prefixo /notification -> kore-notification:8081)"
+  value       = "http://${aws_instance.proxy.public_ip}/notification/"
 }
 
 output "url_rabbitmq_management" {

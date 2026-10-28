@@ -3,3 +3,29 @@ project_name          = "kore"
 key_name              = "vockey"
 instance_type_proxy   = "t2.micro"
 instance_type_backend = "t3.small"
+
+# Restrinja o SSH ao seu IP, ex: "203.0.113.10/32"
+ssh_admin_cidr = "0.0.0.0/0"
+
+# Imagens publicadas no Docker Hub
+image_frontend     = "henryfranz/kore-front-end:latest"
+image_main         = "henryfranz/kore-back-end-main:latest"
+image_notification = "henryfranz/kore-back-end-notification:latest"
+
+rabbitmq_user     = "guest"
+rabbitmq_password = "guest"
+
+# Vira o arquivo .env da instancia privada (nao versione senhas reais)
+backend_env = {
+  MYSQL_ROOT_PASSWORD        = "troque-esta-senha"
+  MYSQL_DATABASE             = "kore"
+  MYSQL_USER                 = "kore"
+  MYSQL_PASSWORD             = "troque-esta-senha"
+  SPRING_DATASOURCE_URL      = "jdbc:mysql://database:3306/kore?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo"
+  SPRING_DATASOURCE_USERNAME = "kore"
+  SPRING_DATASOURCE_PASSWORD = "troque-esta-senha"
+  SPRING_RABBITMQ_HOST       = "rabbitmq"
+  SPRING_RABBITMQ_PORT       = "5672"
+  SPRING_RABBITMQ_USERNAME   = "guest"
+  SPRING_RABBITMQ_PASSWORD   = "guest"
+}

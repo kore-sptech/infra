@@ -34,6 +34,12 @@ variable "availability_zone" {
   default     = "us-east-1a"
 }
 
+variable "ssh_admin_cidr" {
+  description = "CIDR autorizado a abrir SSH no proxy (restrinja ao IP do administrador)"
+  type        = string
+  default     = "0.0.0.0/0"
+}
+
 variable "key_name" {
   description = "Nome do par de chaves EC2 (vockey é o padrão da AWS Academy)"
   type        = string
@@ -50,4 +56,64 @@ variable "instance_type_backend" {
   description = "Tipo de instância EC2 para o Backend Spring Boot + RabbitMQ (recomendado t3.small ou t3.medium)"
   type        = string
   default     = "t3.small"
+}
+
+# ==========================================
+# APLICAÇÃO (imagens Docker e variáveis de ambiente)
+# ==========================================
+variable "image_frontend" {
+  description = "Imagem Docker do frontend React (roda na instância pública)"
+  type        = string
+  default     = "henryfranz/kore-front-end:latest"
+}
+
+variable "image_main" {
+  description = "Imagem Docker do microserviço principal Spring Boot (porta 8080)"
+  type        = string
+  default     = "henryfranz/kore-back-end-main:latest"
+}
+
+variable "image_notification" {
+  description = "Imagem Docker do microserviço de notificação (porta 8081)"
+  type        = string
+  default     = "henryfranz/kore-back-end-notification:latest"
+}
+
+variable "frontend_port" {
+  description = "Porta no loopback da instância pública onde o container do frontend é publicado"
+  type        = number
+  default     = 3000
+}
+
+variable "rabbitmq_user" {
+  description = "Usuário do RabbitMQ"
+  type        = string
+  default     = "guest"
+}
+
+variable "rabbitmq_password" {
+  description = "Senha do RabbitMQ"
+  type        = string
+  default     = "guest"
+  sensitive   = true
+}
+
+variable "backend_env" {
+  description = "Conteúdo do arquivo .env usado pelos containers do backend (MySQL, Spring, RabbitMQ)"
+  type        = map(string)
+  sensitive   = true
+
+  default = {
+    MYSQL_ROOT_PASSWORD        = "change-me-root"
+    MYSQL_DATABASE             = "kore"
+    MYSQL_USER                 = "kore"
+    MYSQL_PASSWORD             = "change-me"
+    SPRING_DATASOURCE_URL      = "jdbc:mysql://database:3306/kore?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo"
+    SPRING_DATASOURCE_USERNAME = "kore"
+    SPRING_DATASOURCE_PASSWORD = "change-me"
+    SPRING_RABBITMQ_HOST       = "rabbitmq"
+    SPRING_RABBITMQ_PORT       = "5672"
+    SPRING_RABBITMQ_USERNAME   = "guest"
+    SPRING_RABBITMQ_PASSWORD   = "guest"
+  }
 }

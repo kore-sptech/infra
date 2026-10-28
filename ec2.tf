@@ -16,7 +16,13 @@ resource "aws_instance" "backend" {
   }
 
   user_data = templatefile("${path.module}/templates/user_data_backend.sh.tpl", {
-    backend_docker_compose = file("${path.module}/templates/docker-compose-backend.yml.tpl")
+    backend_docker_compose = templatefile("${path.module}/templates/docker-compose-backend.yml.tpl", {
+      image_main         = var.image_main
+      image_notification = var.image_notification
+      rabbitmq_user      = var.rabbitmq_user
+      rabbitmq_password  = var.rabbitmq_password
+    }),
+    backend_env_file = join("\n", [for k, v in var.backend_env : "${k}=${v}"])
   })
 
   # Garante que o NAT Gateway esteja pronto para a instancia conseguir acessar a internet
@@ -52,6 +58,11 @@ resource "aws_instance" "proxy" {
   user_data = templatefile("${path.module}/templates/user_data_proxy.sh.tpl", {
     nginx_config = templatefile("${path.module}/templates/nginx.conf.tpl", {
       backend_private_ip = aws_instance.backend.private_ip
+      frontend_port      = var.frontend_port
+    }),
+    proxy_docker_compose = templatefile("${path.module}/templates/docker-compose-proxy.yml.tpl", {
+      image_frontend = var.image_frontend
+      frontend_port  = var.frontend_port
     }),
     backend_private_ip = aws_instance.backend.private_ip
   })
