@@ -139,6 +139,12 @@ variable "s3_bucket_name" {
   default     = ""
 }
 
+variable "create_s3_bucket" {
+  description = "true cria o bucket pelo Terraform; false apenas referencia um bucket já existente (use se a SCP do lab bloquear a leitura do bucket)"
+  type        = bool
+  default     = true
+}
+
 variable "backend_instance_profile" {
   description = "Instance profile anexado à EC2 privada para o backend assumir permissões de S3 (no AWS Academy use LabInstanceProfile). Vazio desativa."
   type        = string

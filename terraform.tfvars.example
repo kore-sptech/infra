@@ -33,6 +33,10 @@ backend_env = {
 # Bucket de fotos. Vazio = kore-fotos-<account_id>
 s3_bucket_name = ""
 
+# false: bucket criado manualmente pela console, Terraform so referencia
+# (necessario se a SCP do lab negar GetObjectLockConfiguration)
+create_s3_bucket = true
+
 # Preferido: a EC2 privada assume a role do lab e o SDK pega as credenciais sozinho
 backend_instance_profile = "LabInstanceProfile"
 

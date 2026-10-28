@@ -5,9 +5,9 @@ locals {
   # Vai para um arquivo separado do .env, montado so no container kore-main
   backend_aws_env = merge(
     {
-      AWS_S3_BUCKET_NAME     = aws_s3_bucket.fotos.bucket
+      AWS_S3_BUCKET_NAME     = local.s3_bucket_id
       AWS_S3_REGION          = var.aws_region
-      AWS_S3_PUBLIC_BASE_URL = "https://${aws_s3_bucket.fotos.bucket}.s3.${var.aws_region}.amazonaws.com"
+      AWS_S3_PUBLIC_BASE_URL = "https://${local.s3_bucket_id}.s3.${var.aws_region}.amazonaws.com"
     },
     # Chaves estaticas so entram se preenchidas; vazias = SDK usa o instance profile
     { for k, v in {

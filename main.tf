@@ -3,8 +3,9 @@ terraform {
 
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+      source = "hashicorp/aws"
+      # Versões antigas falham no read do S3 quando a SCP do lab nega GetObjectLockConfiguration
+      version = ">= 5.70.0, < 6.0.0"
     }
   }
 }

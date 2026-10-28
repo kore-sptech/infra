@@ -35,12 +35,12 @@ output "url_rabbitmq_management" {
 
 output "s3_bucket_name" {
   description = "Nome do bucket de fotos usado pelo backend"
-  value       = aws_s3_bucket.fotos.bucket
+  value       = local.s3_bucket_id
 }
 
 output "s3_public_base_url" {
   description = "URL base publica dos objetos do bucket (AWS_S3_PUBLIC_BASE_URL)"
-  value       = "https://${aws_s3_bucket.fotos.bucket}.s3.${var.aws_region}.amazonaws.com"
+  value       = "https://${local.s3_bucket_id}.s3.${var.aws_region}.amazonaws.com"
 }
 
 output "ssh_command_proxy" {
