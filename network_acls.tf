@@ -47,8 +47,8 @@ resource "aws_network_acl" "public" {
     rule_no    = 140
     action     = "allow"
     protocol   = "icmp"
-    from_port  = -1
-    to_port    = -1
+    from_port  = 0
+    to_port    = 0
     icmp_type  = -1
     icmp_code  = -1
     cidr_block = var.vpc_cidr
@@ -114,8 +114,8 @@ resource "aws_network_acl" "public" {
     rule_no    = 160
     action     = "allow"
     protocol   = "icmp"
-    from_port  = -1
-    to_port    = -1
+    from_port  = 0
+    to_port    = 0
     icmp_type  = -1
     icmp_code  = -1
     cidr_block = var.vpc_cidr
@@ -178,8 +178,8 @@ resource "aws_network_acl" "private" {
     rule_no    = 140
     action     = "allow"
     protocol   = "icmp"
-    from_port  = -1
-    to_port    = -1
+    from_port  = 0
+    to_port    = 0
     icmp_type  = -1
     icmp_code  = -1
     cidr_block = var.vpc_cidr
@@ -227,8 +227,8 @@ resource "aws_network_acl" "private" {
     rule_no    = 130
     action     = "allow"
     protocol   = "icmp"
-    from_port  = -1
-    to_port    = -1
+    from_port  = 0
+    to_port    = 0
     icmp_type  = -1
     icmp_code  = -1
     cidr_block = var.vpc_cidr
