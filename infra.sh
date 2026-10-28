@@ -41,6 +41,7 @@ function show_help() {
   echo -e "  ${GREEN}ssh-proxy${NC}    Conecta via SSH na máquina pública (Proxy / Frontend)"
   echo -e "  ${GREEN}ssh-backend${NC}  Conecta via SSH na máquina privada (Backend / RabbitMQ) via Jump"
   echo -e "  ${GREEN}reset-state${NC}  Limpa o estado do Terraform local (caso mude de conta do Lab)"
+  echo -e "  ${GREEN}untrack-s3${NC}   Desvincula o bucket S3 do state (contorna a SCP do AWS Academy)"
   echo ""
 }
 
@@ -208,6 +209,21 @@ case "$1" in
     fi
     echo -e "${GREEN}Conectando ao Backend privado ($BACKEND_IP) via Proxy Bastion ($PROXY_IP)...${NC}"
     ssh -i "$KEY" -J ubuntu@"$PROXY_IP" ubuntu@"$BACKEND_IP"
+    ;;
+
+  untrack-s3)
+    check_terraform
+    print_banner
+    echo -e "${YELLOW}Removendo o bucket S3 do state (ele continua existindo na AWS)...${NC}\n"
+    S3_RESOURCES=$(terraform state list 2>/dev/null | grep '^aws_s3_bucket\.' || true)
+    if [ -z "$S3_RESOURCES" ]; then
+      echo -e "${GREEN}✔ Nada a remover: o bucket já não está no state.${NC}"
+    else
+      for RES in $S3_RESOURCES; do
+        terraform state rm "$RES"
+      done
+      echo -e "\n${GREEN}✔ Bucket desvinculado. Agora rode ./infra.sh up normalmente.${NC}"
+    fi
     ;;
 
   reset-state)
