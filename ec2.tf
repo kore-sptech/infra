@@ -9,9 +9,10 @@ resource "aws_instance" "backend" {
 
   vpc_security_group_ids = [aws_security_group.backend.id]
 
+  # AWS Academy so permite gp2 e volumes de ate 30 GB
   root_block_device {
-    volume_size           = 20
-    volume_type           = "gp3"
+    volume_size           = var.root_volume_size_backend
+    volume_type           = "gp2"
     delete_on_termination = true
   }
 
@@ -50,8 +51,8 @@ resource "aws_instance" "proxy" {
   vpc_security_group_ids = [aws_security_group.proxy.id]
 
   root_block_device {
-    volume_size           = 16
-    volume_type           = "gp3"
+    volume_size           = var.root_volume_size_proxy
+    volume_type           = "gp2"
     delete_on_termination = true
   }
 

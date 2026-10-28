@@ -58,6 +58,18 @@ variable "instance_type_backend" {
   default     = "t3.small"
 }
 
+variable "root_volume_size_proxy" {
+  description = "Tamanho do disco da instância pública em GB (o Learner Lab limita a 30)"
+  type        = number
+  default     = 16
+}
+
+variable "root_volume_size_backend" {
+  description = "Tamanho do disco da instância privada em GB (o Learner Lab limita a 30)"
+  type        = number
+  default     = 20
+}
+
 # ==========================================
 # APLICAÇÃO (imagens Docker e variáveis de ambiente)
 # ==========================================
