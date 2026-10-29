@@ -34,8 +34,17 @@ http {
     }
 
     # Containers do frontend React (latest e v1) na propria instancia publica
-    # Round-robin padrao: as requisicoes alternam entre frontend-1 e frontend-2
+    # So a navegacao (HTML) usa este pool, entao cada F5 alterna entre frontend-1 e frontend-2
     upstream frontend_pool {
+        # Estado do round-robin compartilhado entre os workers do Nginx
+        zone frontend_pool 64k;
+        server 127.0.0.1:${frontend_port} max_fails=3 fail_timeout=10s;
+        server 127.0.0.1:${frontend_port_2} max_fails=3 fail_timeout=10s;
+        keepalive 32;
+    }
+
+    # Mesmos containers, com round-robin proprio para JS/CSS/imagens nao atrapalharem a alternancia do HTML
+    upstream frontend_static {
         server 127.0.0.1:${frontend_port} max_fails=3 fail_timeout=10s;
         server 127.0.0.1:${frontend_port_2} max_fails=3 fail_timeout=10s;
         keepalive 32;
@@ -106,6 +115,12 @@ http {
             # Fallback estatico enquanto o container sobe
             proxy_intercept_errors on;
             error_page 502 503 504 = @fallback;
+
+            # Cada build (latest e v1) gera arquivos com hash proprio: em 404, tenta o outro container
+            location ~* \.[a-z0-9]+$ {
+                proxy_pass http://frontend_static;
+                proxy_next_upstream error timeout http_404;
+            }
         }
 
         location @fallback {

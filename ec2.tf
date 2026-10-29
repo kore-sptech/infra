@@ -84,6 +84,9 @@ resource "aws_instance" "proxy" {
     delete_on_termination = true
   }
 
+  # O user_data so roda no primeiro boot: recria o proxy para aplicar mudancas no nginx.conf/compose
+  user_data_replace_on_change = true
+
   user_data = templatefile("${path.module}/templates/user_data_proxy.sh.tpl", {
     nginx_config = templatefile("${path.module}/templates/nginx.conf.tpl", {
       backend_private_ip = aws_instance.backend.private_ip
