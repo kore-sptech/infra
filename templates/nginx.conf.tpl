@@ -33,9 +33,11 @@ http {
         keepalive 32;
     }
 
-    # Container do frontend React rodando na propria instancia publica
+    # Containers do frontend React (latest e v1) na propria instancia publica
+    # Round-robin padrao: as requisicoes alternam entre frontend-1 e frontend-2
     upstream frontend_pool {
-        server 127.0.0.1:${frontend_port};
+        server 127.0.0.1:${frontend_port} max_fails=3 fail_timeout=10s;
+        server 127.0.0.1:${frontend_port_2} max_fails=3 fail_timeout=10s;
         keepalive 32;
     }
 

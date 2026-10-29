@@ -9,3 +9,10 @@ services:
     restart: always
     ports:
       - "127.0.0.1:${frontend_port}:80"
+
+  frontend-2:
+    image: ${image_frontend_2}
+    container_name: frontend-2
+    restart: always
+    ports:
+      - "127.0.0.1:${frontend_port_2}:80"

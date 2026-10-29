@@ -88,10 +88,13 @@ resource "aws_instance" "proxy" {
     nginx_config = templatefile("${path.module}/templates/nginx.conf.tpl", {
       backend_private_ip = aws_instance.backend.private_ip
       frontend_port      = var.frontend_port
+      frontend_port_2    = var.frontend_port_2
     }),
     proxy_docker_compose = templatefile("${path.module}/templates/docker-compose-proxy.yml.tpl", {
-      image_frontend = var.image_frontend
-      frontend_port  = var.frontend_port
+      image_frontend   = var.image_frontend
+      image_frontend_2 = var.image_frontend_2
+      frontend_port    = var.frontend_port
+      frontend_port_2  = var.frontend_port_2
     }),
     backend_private_ip = aws_instance.backend.private_ip
   })

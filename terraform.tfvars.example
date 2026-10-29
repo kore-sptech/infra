@@ -9,6 +9,7 @@ ssh_admin_cidr = "0.0.0.0/0"
 
 # Imagens publicadas no Docker Hub
 image_frontend     = "henryfranz/kore-front-end:latest"
+image_frontend_2   = "henryfranz/kore-front-end:1"
 image_main         = "henryfranz/kore-back-end-main:latest"
 image_notification = "henryfranz/kore-back-end-notification:latest"
 

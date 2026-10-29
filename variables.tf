@@ -79,6 +79,12 @@ variable "image_frontend" {
   default     = "henryfranz/kore-front-end:latest"
 }
 
+variable "image_frontend_2" {
+  description = "Imagem Docker da segunda réplica do frontend (versão 1), para demonstrar o balanceamento do Nginx"
+  type        = string
+  default     = "henryfranz/kore-front-end:1"
+}
+
 variable "image_main" {
   description = "Imagem Docker do microserviço principal Spring Boot (porta 8080)"
   type        = string
@@ -95,6 +101,12 @@ variable "frontend_port" {
   description = "Porta no loopback da instância pública onde o container do frontend é publicado"
   type        = number
   default     = 3000
+}
+
+variable "frontend_port_2" {
+  description = "Porta no loopback da instância pública onde o segundo container do frontend é publicado"
+  type        = number
+  default     = 3001
 }
 
 variable "rabbitmq_user" {
