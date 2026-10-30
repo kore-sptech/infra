@@ -26,6 +26,17 @@ cat << 'EOF' > /home/ubuntu/app/docker-compose.yml
 ${backend_docker_compose}
 EOF
 
+cat << 'EOF' > /home/ubuntu/app/.env
+${backend_env_file}
+EOF
+chmod 600 /home/ubuntu/app/.env
+
+# Credenciais e configuracao do S3, lidas apenas pelo container kore-main
+cat << 'EOF' > /home/ubuntu/app/aws.env
+${backend_aws_env_file}
+EOF
+chmod 600 /home/ubuntu/app/aws.env
+
 chown -R ubuntu:ubuntu /home/ubuntu/app
 cd /home/ubuntu/app
 docker compose up -d

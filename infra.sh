@@ -41,6 +41,7 @@ function show_help() {
   echo -e "  ${GREEN}ssh-proxy${NC}    Conecta via SSH na máquina pública (Proxy / Frontend)"
   echo -e "  ${GREEN}ssh-backend${NC}  Conecta via SSH na máquina privada (Backend / RabbitMQ) via Jump"
   echo -e "  ${GREEN}reset-state${NC}  Limpa o estado do Terraform local (caso mude de conta do Lab)"
+  echo -e "  ${GREEN}untrack-s3${NC}   Desvincula o bucket S3 do state (contorna a SCP do AWS Academy)"
   echo ""
 }
 
@@ -64,19 +65,36 @@ function update_creds() {
     exit 1
   fi
 
+  # Remove CR do Windows: um \r invisível no fim do token invalida a assinatura
+  RAW_INPUT=$(printf '%s\n' "$RAW_INPUT" | tr -d '\r')
+
   # Cria o diretório ~/.aws se não existir
   mkdir -p ~/.aws
 
   # Se for o formato [default] ...
   if echo "$RAW_INPUT" | grep -q "aws_access_key_id"; then
-    echo "$RAW_INPUT" > ~/.aws/credentials
+    printf '%s\n' "$RAW_INPUT" > ~/.aws/credentials
+    chmod 600 ~/.aws/credentials
     echo -e "\n${GREEN}✔ Arquivo ~/.aws/credentials atualizado com sucesso!${NC}"
   fi
 
-  # Extrai para o arquivo .env local também para garantir no shell
-  ACCESS_KEY=$(echo "$RAW_INPUT" | grep -i "aws_access_key_id" | head -n1 | sed -E 's/.*=[ ]*"?([^" ]*)"?/\1/')
-  SECRET_KEY=$(echo "$RAW_INPUT" | grep -i "aws_secret_access_key" | head -n1 | sed -E 's/.*=[ ]*"?([^" ]*)"?/\1/')
-  SESSION_TOKEN=$(echo "$RAW_INPUT" | grep -i "aws_session_token" | head -n1 | sed -E 's/.*=[ ]*"?([^" ]*)"?/\1/')
+  # Pega tudo depois do primeiro '=': o session token é base64 e contém '=' no final
+  function extract_cred() {
+    printf '%s\n' "$RAW_INPUT" \
+      | grep -i -m1 "^[[:space:]]*$1[[:space:]]*=" \
+      | cut -d= -f2- \
+      | sed -E 's/^[[:space:]]*"?//; s/"?[[:space:]]*$//' || true
+  }
+
+  ACCESS_KEY=$(extract_cred "aws_access_key_id")
+  SECRET_KEY=$(extract_cred "aws_secret_access_key")
+  SESSION_TOKEN=$(extract_cred "aws_session_token")
+
+  if [ -z "$ACCESS_KEY" ] || [ -z "$SECRET_KEY" ] || [ -z "$SESSION_TOKEN" ]; then
+    echo -e "${RED}Erro: não consegui extrair as 3 credenciais do texto colado.${NC}"
+    echo -e "Cole o bloco completo da aba ${BLUE}AWS Details > AWS CLI${NC} do Learner Lab."
+    exit 1
+  fi
 
   cat << EOF > "$DIR/.env"
 export AWS_ACCESS_KEY_ID="$ACCESS_KEY"
@@ -85,9 +103,25 @@ export AWS_SESSION_TOKEN="$SESSION_TOKEN"
 export AWS_DEFAULT_REGION="us-east-1"
 export AWS_REGION="us-east-1"
 EOF
+  chmod 600 "$DIR/.env"
 
   echo -e "${GREEN}✔ Arquivo .env local atualizado!${NC}"
   echo -e "Credenciais configuradas para a região: ${BLUE}us-east-1${NC}\n"
+
+  # Valida na hora para não descobrir o token expirado só no terraform apply
+  if command -v aws &> /dev/null; then
+    set -a
+    # shellcheck source=/dev/null
+    source "$DIR/.env"
+    set +a
+    if aws sts get-caller-identity > /dev/null 2>&1; then
+      echo -e "${GREEN}✔ Credenciais válidas (STS respondeu).${NC}\n"
+    else
+      echo -e "${RED}As credenciais foram salvas mas o STS recusou.${NC}"
+      echo -e "Clique em ${YELLOW}Start Lab${NC} no Learner Lab e copie as credenciais novamente.\n"
+      exit 1
+    fi
+  fi
 }
 
 function find_ssh_key() {
@@ -175,6 +209,21 @@ case "$1" in
     fi
     echo -e "${GREEN}Conectando ao Backend privado ($BACKEND_IP) via Proxy Bastion ($PROXY_IP)...${NC}"
     ssh -i "$KEY" -J ubuntu@"$PROXY_IP" ubuntu@"$BACKEND_IP"
+    ;;
+
+  untrack-s3)
+    check_terraform
+    print_banner
+    echo -e "${YELLOW}Removendo o bucket S3 do state (ele continua existindo na AWS)...${NC}\n"
+    S3_RESOURCES=$(terraform state list 2>/dev/null | grep '^aws_s3_bucket\.' || true)
+    if [ -z "$S3_RESOURCES" ]; then
+      echo -e "${GREEN}✔ Nada a remover: o bucket já não está no state.${NC}"
+    else
+      for RES in $S3_RESOURCES; do
+        terraform state rm "$RES"
+      done
+      echo -e "\n${GREEN}✔ Bucket desvinculado. Agora rode ./infra.sh up normalmente.${NC}"
+    fi
     ;;
 
   reset-state)
