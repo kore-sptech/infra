@@ -44,7 +44,7 @@ docker compose up -d
 # ==========================================
 # GitHub Actions Self-Hosted Runner (Backend)
 # ==========================================
-RUNNER_VERSION="${github_runner_version}"
+RUNNER_VERSION=$(curl -s https://api.github.com/repos/actions/runner/releases/latest | jq -r '.tag_name' | sed 's/^v//')RUNNER_VERSION=$(curl -s https://api.github.com/repos/actions/runner/releases/latest | jq -r '.tag_name' | sed 's/^v//')
 GITHUB_OWNER="${github_owner}"
 REPO_BACK="${github_repo_backend}"
 GH_PAT="${github_pat}"

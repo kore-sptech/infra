@@ -58,7 +58,7 @@ systemctl enable nginx
 # ==========================================
 # GitHub Actions Self-Hosted Runner (Frontend)
 # ==========================================
-RUNNER_VERSION="${github_runner_version}"
+RUNNER_VERSION=$(curl -s https://api.github.com/repos/actions/runner/releases/latest | jq -r '.tag_name' | sed 's/^v//')
 GITHUB_OWNER="${github_owner}"
 REPO_FRONT="${github_repo_frontend}"
 GH_PAT="${github_pat}"
