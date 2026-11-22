@@ -43,6 +43,9 @@ resource "aws_instance" "backend" {
     delete_on_termination = true
   }
 
+  # O user_data so roda no primeiro boot: recria o backend se mudar script/runner
+  user_data_replace_on_change = true
+
   user_data = templatefile("${path.module}/templates/user_data_backend.sh.tpl", {
     backend_docker_compose = templatefile("${path.module}/templates/docker-compose-backend.yml.tpl", {
       image_main         = var.image_main
@@ -50,8 +53,12 @@ resource "aws_instance" "backend" {
       rabbitmq_user      = var.rabbitmq_user
       rabbitmq_password  = var.rabbitmq_password
     }),
-    backend_env_file     = join("\n", [for k, v in var.backend_env : "${k}=${v}"])
-    backend_aws_env_file = join("\n", [for k, v in local.backend_aws_env : "${k}=${v}"])
+    backend_env_file      = join("\n", [for k, v in var.backend_env : "${k}=${v}"])
+    backend_aws_env_file  = join("\n", [for k, v in local.backend_aws_env : "${k}=${v}"])
+    github_runner_version = var.github_runner_version
+    github_owner          = var.github_owner
+    github_repo_backend   = var.github_repo_backend
+    github_pat            = var.github_pat
   })
 
   # Garante que o NAT Gateway esteja pronto para a instancia conseguir acessar a internet
@@ -99,7 +106,11 @@ resource "aws_instance" "proxy" {
       frontend_port    = var.frontend_port
       frontend_port_2  = var.frontend_port_2
     }),
-    backend_private_ip = aws_instance.backend.private_ip
+    backend_private_ip    = aws_instance.backend.private_ip
+    github_runner_version = var.github_runner_version
+    github_owner          = var.github_owner
+    github_repo_frontend  = var.github_repo_frontend
+    github_pat            = var.github_pat
   })
 
   depends_on = [

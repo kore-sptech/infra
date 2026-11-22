@@ -183,3 +183,37 @@ variable "backend_aws_session_token" {
   default     = ""
   sensitive   = true
 }
+
+# ==========================================
+# GITHUB ACTIONS SELF-HOSTED RUNNERS
+# ==========================================
+variable "github_runner_version" {
+  description = "Versão do GitHub Actions Runner a ser instalada nas instâncias EC2"
+  type        = string
+  default     = "2.316.1"
+}
+
+variable "github_owner" {
+  description = "Usuário ou organização do GitHub dono dos repositórios"
+  type        = string
+  default     = "kore-sptech"
+}
+
+variable "github_repo_backend" {
+  description = "Nome do repositório do Backend no GitHub"
+  type        = string
+  default     = "back-end"
+}
+
+variable "github_repo_frontend" {
+  description = "Nome do repositório do Frontend no GitHub"
+  type        = string
+  default     = "front-end"
+}
+
+variable "github_pat" {
+  description = "Personal Access Token (classic) do GitHub com escopo 'repo' (ou 'admin:org') para registrar os runners automaticamente. Deixe vazio para pular o registro."
+  type        = string
+  default     = ""
+  sensitive   = true
+}

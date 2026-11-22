@@ -55,4 +55,42 @@ nginx -t
 systemctl restart nginx
 systemctl enable nginx
 
+# ==========================================
+# GitHub Actions Self-Hosted Runner (Frontend)
+# ==========================================
+RUNNER_VERSION="${github_runner_version}"
+GITHUB_OWNER="${github_owner}"
+REPO_FRONT="${github_repo_frontend}"
+GH_PAT="${github_pat}"
+
+setup_runner() {
+  DIR=$1
+  REPO=$2
+  NAME=$3
+
+  if [ -z "$GH_PAT" ]; then
+    echo "GH_PAT vazio, pulando registro do runner $NAME"
+    return 0
+  fi
+
+  mkdir -p /home/ubuntu/$DIR && cd /home/ubuntu/$DIR
+  curl -o actions-runner.tar.gz -L https://github.com/actions/runner/releases/download/v$${RUNNER_VERSION}/actions-runner-linux-x64-$${RUNNER_VERSION}.tar.gz
+  tar xzf ./actions-runner.tar.gz
+  chown -R ubuntu:ubuntu /home/ubuntu/$DIR
+
+  REG_TOKEN=$(curl -s -X POST -H "Authorization: token $${GH_PAT}" \
+    -H "Accept: application/vnd.github.v3+json" \
+    https://api.github.com/repos/$${GITHUB_OWNER}/$${REPO}/actions/runners/registration-token | jq -r .token)
+
+  if [ -z "$REG_TOKEN" ] || [ "$REG_TOKEN" = "null" ]; then
+    echo "Falha ao obter registration token para $${GITHUB_OWNER}/$${REPO}. Verifique o GH_PAT e o nome do repositorio."
+    return 1
+  fi
+
+  su - ubuntu -c "cd /home/ubuntu/$DIR && ./config.sh --url https://github.com/$${GITHUB_OWNER}/$${REPO} --token $${REG_TOKEN} --name $${NAME} --unattended --replace"
+  cd /home/ubuntu/$DIR && ./svc.sh install ubuntu && ./svc.sh start
+}
+
+setup_runner "runner-frontend" "$REPO_FRONT" "ec2-frontend"
+
 echo "Proxy configurado com sucesso!" > /tmp/user_data_finished.log
