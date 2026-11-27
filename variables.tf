@@ -139,6 +139,7 @@ variable "backend_env" {
     SPRING_RABBITMQ_PORT       = "5672"
     SPRING_RABBITMQ_USERNAME   = "guest"
     SPRING_RABBITMQ_PASSWORD   = "guest"
+    JWT_SECRET                 = "kore-jwt-secret-key-2026-sptech-production-minimum-256-bits"
   }
 }
 
